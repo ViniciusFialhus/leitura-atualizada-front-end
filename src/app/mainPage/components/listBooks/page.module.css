@@ -1,0 +1,202 @@
+.containerListBook {
+  height: 100%;
+  width: 100%;
+}
+
+.containerListBook .headerFilter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  background-color: black;
+}
+
+.headerFilter .containerListFilter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 30%;
+  margin-left: 40px;
+}
+
+.containerListFilter .inputStatus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 60%;
+  font-family: monospace;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  margin-left: 15px;
+  background-color: white;
+}
+
+.containerListFilter .inputStatus span {
+  margin-right: 0px;
+  font-size: 15px;
+}
+
+.containerListFilter .inputStatus div {
+  margin-left: 5px;
+}
+
+.inputStatusFree {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 60%;
+  font-family: monospace;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  color: white;
+  background-color: green;
+}
+
+.inputStatusFree:active {
+  background-color: rgb(52, 158, 52);
+}
+
+.inputStatusAnalysis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 60%;
+  font-family: monospace;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  background-color: yellow;
+}
+
+.inputStatusAnalysis:active {
+  background-color: rgb(230, 230, 95);
+}
+
+.inputStatusBorrowed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 60%;
+  font-family: monospace;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  color: white;
+  background-color: red;
+}
+
+.inputStatusBorrowed:active {
+  background-color: rgb(187, 53, 53);
+}
+
+.headerFilter span {
+  margin-right: 20px;
+  background-color: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.listBook {
+
+  height: 92%;
+  width: 100%;
+  overflow: auto;
+  border-radius: 15px;
+}
+
+.book{
+  display: flex;
+  align-items: center;
+  height: 30%;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.bookImg{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 10%;
+  margin-left: 15px;
+}
+
+.bookImg img{
+  height: 70%;
+  width: 80%;
+  margin-bottom: 5px;
+  background-color: red;
+}
+
+.hrVertical{
+margin: 0;
+height: 50%;
+margin-top: 25px;
+}
+
+.detailArea{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  width: 25%;
+  margin-left: 15px;
+
+}
+
+.detailArea strong{
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.detailArea div{
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.descriptionBook{
+  height: 40px;
+  width: 80%;
+  overflow: auto;
+  margin-left: 30px;
+}
+
+.hrHorizontal{
+  margin: 0;
+  width: 50%;
+  margin-top: 15px;
+}
+
+.containerFunctions{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 50%;
+  width: 15%;
+  
+}
+
+.containerFunctions .containerAdm{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.containerFunctions .containerUser{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 15px;
+}
