@@ -2,9 +2,12 @@
 import style from "./page.module.css";
 import logo from "../assets/logo.png";
 import { useState, useRef, useEffect } from "react";
+import { getBooks } from "../axios";
 import ListBook from "./components/listBooks/listbooks";
 import GeneralModal from "./components/generalModal/GeneralModal";
 import GeneralModalGlobal from "./components/generalModalGlobal/page";
+
+import { getUser, loginRefresh } from "../axios";
 
 export default function MainPage() {
   const [fillOrOutlinePerson, setFillOrOutlinePerson] = useState(false);
@@ -13,6 +16,22 @@ export default function MainPage() {
   const [modalShowPerson, setModalShowPerson] = useState(false);
   const [modalShowBook, setModalShowBook] = useState(false);
   const [modalCreateBook, setModalCreateBook] = useState(false);
+  const [filterInput, setFilterInput] = useState("title");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [books, setBooks] = useState([]);
+  const [bookId, setBookId] = useState();
+  const [loogedUser, setLoogedUser] = useState({
+    id: "",
+    name: "",
+    email: "",
+    isAdm: false,
+    password: "",
+    username: "",
+    createdAt: "",
+    updatedAt: "",
+    shareableHash: "",
+    refreshToken: "",
+  });
 
   const refPerson = useRef(null);
 
@@ -40,6 +59,11 @@ export default function MainPage() {
     }
   };
 
+  const filteredBooks = books.filter((book) => {
+    const bookField = book[filterInput].toString().toLowerCase();
+    return bookField.includes(searchTerm.toLowerCase());
+  });
+
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (refPerson.current && !refPerson.current.contains(event.target)) {
@@ -54,6 +78,44 @@ export default function MainPage() {
     };
   }, []);
 
+  useEffect(() => {
+    const AxiosGetUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const UserAPI = await getUser(token);
+        setLoogedUser(UserAPI);
+      } catch (error) {
+        console.error("Erro ao buscar User:", error);
+      }
+    };
+    AxiosGetUser();
+  }, []);
+
+  useEffect(() => {
+    const axiosGetBooks = async () => {
+      try {
+        const booksAPI = await getBooks();
+        setBooks(booksAPI);
+      } catch (error) {
+        console.error("Erro ao buscar livros:", error);
+      }
+    };
+
+    axiosGetBooks();
+  }, []);
+
+  useEffect(() => {
+    const refreshToken = async () => {
+      const token = localStorage.getItem("refreshToken");
+      if (token) {
+        await loginRefresh(token);
+      }
+    };
+    refreshToken();
+    const interval = setInterval(refreshToken, 240000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <main className={style.containerMain}>
       {modalCreateBook ? (
@@ -63,18 +125,22 @@ export default function MainPage() {
         <GeneralModalGlobal setProp={setModalShowPerson} type={"editUser"} />
       ) : null}
       {modalShowBook ? (
-        <GeneralModalGlobal setProp={setModalShowBook} type={"editBook"} />
+        <GeneralModalGlobal
+          setProp={setModalShowBook}
+          type={"editBook"}
+          bookId={bookId}
+        />
       ) : null}
       {fillOrOutlinePerson ? (
         <GeneralModal
           type={"person"}
           setProp={setModalShowPerson}
           css={{
-            left: "815px",
+            left: loogedUser.isAdm ? "815px" : "853px",
           }}
         />
       ) : null}
-       {fillOrOutlineError ? (
+      {fillOrOutlineError ? (
         <GeneralModal
           type={"loans"}
           setProp={setModalShowPerson}
@@ -91,7 +157,7 @@ export default function MainPage() {
       {fillOrOutlineBook ? (
         <GeneralModal
           css={{
-            left: "777px",
+            left: loogedUser.isAdm ? "777px" : "825px",
             height: "200px",
             bottom: "350px",
             width: "300px",
@@ -106,15 +172,20 @@ export default function MainPage() {
           <img src={logo.src} alt="logo" />
         </div>
         <div className={style.containerSearch}>
-          <select>
+          <select onChange={(e) => setFilterInput(e.target.value)}>
             <option value="title">Titulo</option>
             <option value="author">Autor</option>
             <option value="gender">Gênero</option>
           </select>
-          <input type="text" />
+          <input type="text" onChange={(e) => setSearchTerm(e.target.value)} />
           <span className="material-icons">search</span>
         </div>
-        <div className={style.containerIcons}>
+        <div
+          className={style.containerIcons}
+          style={{
+            justifyContent: loogedUser.isAdm ? "space-around" : "space-evenly",
+          }}
+        >
           <span
             className={
               fillOrOutlinePerson ? "material-icons" : "material-icons-outlined"
@@ -132,18 +203,27 @@ export default function MainPage() {
           >
             book
           </span>
-          <span
-            className={
-              fillOrOutlineError ? "material-icons" : "material-icons-outlined"
-            }
-            onClick={handleClickFillOrOutlineError}
-          >
-            notifications
-          </span>
+          {loogedUser.isAdm && (
+            <span
+              className={
+                fillOrOutlineError
+                  ? "material-icons"
+                  : "material-icons-outlined"
+              }
+              onClick={handleClickFillOrOutlineError}
+            >
+              notifications
+            </span>
+          )}
         </div>
       </header>
       <section className={style.containerListBook}>
-        <ListBook setProp={setModalShowBook} twoSetProp={setModalCreateBook} />
+        <ListBook
+          setProp={setModalShowBook}
+          twoSetProp={setModalCreateBook}
+          setBookId={setBookId}
+          books={filteredBooks}
+        />
       </section>
     </main>
   );

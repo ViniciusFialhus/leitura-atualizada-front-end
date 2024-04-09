@@ -35,6 +35,19 @@
     background-color: white;
 }
 
+.containerFormCreateBook{
+    height: 90%;
+    margin-top: 0px;
+}
+
+.containerFormCreateBook .inputArea{
+    height: 500px;
+}
+
+.containerFormCreateBook .buttonArea{
+    margin-bottom: 10px;
+
+}
 
 .inputArea{
     display: flex;

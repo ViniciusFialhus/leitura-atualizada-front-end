@@ -1,6 +1,13 @@
+"use client";
 import style from "../generalModal/page.module.css";
-import bookDefault from "../../components/listBooks/assets/bookDefault.jpg";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import {
+  getWishlist,
+  deleteWishlist,
+  getLoans,
+  postLoans,
+  putLoans,
+} from "@/app/axios";
 export default function GeneralModal({
   css,
   cssDetail,
@@ -14,124 +21,9 @@ export default function GeneralModal({
   setProp?: any;
   onClose?: any;
 }) {
+  const [wishlist, setWishlist] = useState([]);
+  const [loansList, setLoansList] = useState([]);
   const refPersonInside = useRef(null);
-  const detailedLoans = [
-    {
-      userId: "user01",
-      book: {
-        title: "The Great Gatsby",
-        author: "F. Scott Fitzgerald",
-        isbn: "9780743273565",
-        imageUrl: "https://example.com/gatsby.jpg",
-        genre: "Novel",
-        description:
-          "A portrait of the Jazz Age in all of its decadence and excess.",
-        publishedAt: new Date("1925-04-10"),
-      },
-    },
-    {
-      userId: "user02",
-      book: {
-        title: "1984",
-        author: "George Orwell",
-        isbn: "9780451524935",
-        imageUrl: "https://example.com/1984.jpg",
-        genre: "Dystopian",
-        description:
-          "A dystopian social science fiction novel and cautionary tale.",
-        publishedAt: new Date("1949-06-08"),
-      },
-    },
-    {
-      userId: "user03",
-      book: {
-        title: "To Kill a Mockingbird",
-        author: "Harper Lee",
-        isbn: "9780061120084",
-        imageUrl: "https://example.com/mockingbird.jpg",
-        genre: "Novel",
-        description:
-          "A novel about the serious issues of rape and racial inequality.",
-        publishedAt: new Date("1960-07-11"),
-      },
-    },
-    {
-      userId: "user04",
-      book: {
-        title: "The Catcher in the Rye",
-        author: "J.D. Salinger",
-        isbn: "9780316769488",
-        imageUrl: "https://example.com/catcher.jpg",
-        genre: "Fiction",
-        description:
-          "A story about adolescent alienation and loss of innocence.",
-        publishedAt: new Date("1951-07-16"),
-      },
-    },
-    {
-      userId: "user05",
-      book: {
-        title: "Pride and Prejudice",
-        author: "Jane Austen",
-        isbn: "9780679783268",
-        imageUrl: "https://example.com/pride.jpg",
-        genre: "Novel",
-        description: "A romantic novel of manners.",
-        publishedAt: new Date("1813-01-28"),
-      },
-    },
-    {
-      userId: "user06",
-      book: {
-        title: "The Hobbit",
-        author: "J.R.R. Tolkien",
-        isbn: "9780547928227",
-        imageUrl: "https://example.com/hobbit.jpg",
-        genre: "Fantasy",
-        description:
-          "A children's fantasy novel and prelude to The Lord of the Rings.",
-        publishedAt: new Date("1937-09-21"),
-      },
-    },
-    {
-      userId: "user07",
-      book: {
-        title: "Moby-Dick",
-        author: "Herman Melville",
-        isbn: "9781503280786",
-        imageUrl: "https://example.com/mobydick.jpg",
-        genre: "Novel",
-        description:
-          "An epic sea story of Captain Ahab's voyage in pursuit of a white whale.",
-        publishedAt: new Date("1851-10-18"),
-      },
-    },
-    {
-      userId: "user08",
-      book: {
-        title: "The Lord of the Rings",
-        author: "J.R.R. Tolkien",
-        isbn: "9780544003415",
-        imageUrl: "https://example.com/lotr.jpg",
-        genre: "Fantasy",
-        description: "An epic high fantasy novel.",
-        publishedAt: new Date("1954-07-29"),
-      },
-    },
-    {
-      userId: "user09",
-      book: {
-        title: "Jane Eyre",
-        author: "Charlotte Brontë",
-        isbn: "9780142437209",
-        imageUrl: "https://example.com/janeeyre.jpg",
-        genre: "Novel",
-        description:
-          "A novel that revolutionized prose fiction by being the first to focus on its protagonist's moral and spiritual development.",
-        publishedAt: new Date("1847-10-16"),
-      },
-    },
-  ];
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
@@ -149,6 +41,91 @@ export default function GeneralModal({
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const AxiosWishList = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const wishListAPI = await getWishlist(token);
+        setWishlist(wishListAPI);
+      } catch (error) {
+        console.error("Erro ao buscar Wishlist:", error);
+      }
+    };
+    AxiosWishList();
+  }, []);
+
+  const deleteWishListBook = async (id: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await deleteWishlist(token, id);
+      if (response) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(Error);
+    }
+  };
+
+  useEffect(() => {
+    const AxiosLoans = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const loansAPI = await getLoans(token);
+        setLoansList(loansAPI);
+      } catch (error) {
+        console.log("Loans Erro, ", Error);
+      }
+    };
+    AxiosLoans();
+  }, []);
+
+  const createLoans = async (bookId: string, userId: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await postLoans(token, bookId, userId);
+      if (response) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log("Erro ao criar pedido de emprestimo", Error);
+    }
+  };
+
+  const aprovedLoans = async (loansID: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const jsonAcess = { status: "approved" };
+      const response = await putLoans(token, jsonAcess, loansID);
+      if (response) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log("Erro ao aprovar Loan", Error);
+    }
+  };
+
+  const desaprovedLoans = async (loansID: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const jsonAcess = { status: "rejected" };
+      const response = await putLoans(token, jsonAcess, loansID);
+      if (response) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log("Erro ao negar Loans", Error);
+    }
+  };
+
+  function formatedData(dataISO) {
+    const dataObjeto = new Date(dataISO);
+    const dia = dataObjeto.getUTCDate().toString().padStart(2, "0");
+    const mes = (dataObjeto.getUTCMonth() + 1).toString().padStart(2, "0");
+    const ano = dataObjeto.getUTCFullYear();
+    return `${dia}/${mes}/${ano}`;
+  }
+
   return (
     <main className={style.containerMain} style={css} ref={refPersonInside}>
       <div className={style.details} style={cssDetail}></div>
@@ -161,69 +138,92 @@ export default function GeneralModal({
         </div>
       ) : type === "book" ? (
         <div className={style.fatherContainerLoans}>
-          {detailedLoans.map((detailedLoans) => {
-            return (
-              <>
-                <div className={style.containerLoans}>
-                  <div className={style.containerImg}>
-                    <img src={bookDefault.src} alt="book" />
+          {wishlist.length === 0 ? (
+            <div className={style.containerEmptyWishlist}>
+              <h1>Sua lista de desejos está vazia</h1>
+            </div>
+          ) : (
+            wishlist.map((detailsWishList) => (
+              <div key={detailsWishList.id} className={style.containerWishlist}>
+                <div className={style.containerImg}>
+                  <img src={detailsWishList.imgUrl} alt="book" />
+                </div>
+                <hr className={style.horizontalHr} />
+                <div className={style.containerDetails}>
+                  <div>
+                    <strong>Titulo:</strong>
+                    {detailsWishList.title}
                   </div>
-                  <hr className={style.horizontalHr} />
-                  <div className={style.containerDetails}>
-                    <div>
-                      <strong>Titulo:</strong>
-                      {detailedLoans.book.title}
-                    </div>
-                    <div>
-                      <strong>Author:</strong>
-                      {detailedLoans.book.author}
-                    </div>
-                    <div>
-                      <strong>Gender:</strong>
-                      {detailedLoans.book.genre}
-                    </div>
-                    <div>
-                      <strong>Status:</strong>
-                      Devolução em x dias
-                    </div>
+                  <div>
+                    <strong>Autor:</strong>
+                    {detailsWishList.author}
+                  </div>
+                  <div>
+                    <strong>Gênero:</strong>
+                    {detailsWishList.genre}
+                  </div>
+                  <div>
+                    <strong>Status:</strong>
+                    {detailsWishList.status === "AVAILABLE"
+                      ? "Em Aberto"
+                      : detailsWishList.status == "LOANED"
+                      ? "Emprestado"
+                      : ""}
+                  </div>
+                  <div className={style.containerButtonGeneralModal}>
+                    <button
+                      onClick={() =>
+                        createLoans(detailsWishList.id, loogedUser.id)
+                      }
+                    >
+                      Reservar Livro
+                    </button>
+                    <button
+                      onClick={() => deleteWishListBook(detailsWishList.id)}
+                    >
+                      Remover Livro
+                    </button>
                   </div>
                 </div>
-              </>
-            );
-          })}
+              </div>
+            ))
+          )}
         </div>
       ) : type === "loans" ? (
         <div className={style.fatherContainerLoans}>
-          {detailedLoans.map((detailedLoans) => {
-            return (
-              <>
-                <div className={style.containerLoans}>
-                  <div className={style.containerImg}>
-                    <img src={bookDefault.src} alt="book" />
+          {loansList
+            .filter((loans) => loans.status === "PENDING")
+            .map((detailedLoans) => {
+              return (
+                <>
+                  <div className={style.containerLoans}>
+                    <div className={style.containerImg}>
+                      <img src={detailedLoans.book.imgUrl}></img>
+                    </div>
+                    <div className={style.detailsArea}>
+                      <div>
+                        <strong>Nome do Livro:</strong>
+                        {detailedLoans.book.title}
+                      </div>
+                      <div>
+                        <strong>Usuario Solicitante:</strong>
+                        {detailedLoans.user.name}
+                      </div>
+                      <div>
+                        <strong>Data de Pedido:</strong>
+                        {formatedData(detailedLoans.createdAt)}
+                      </div>
+                      <div className={style.buttonArea}>
+                        <button onClick={() => aprovedLoans(detailedLoans.id)}>Aprovado</button>
+                        <button onClick={() => desaprovedLoans(detailedLoans.id)}>
+                          Negado
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <hr className={style.horizontalHr} />
-                  <div className={style.containerDetails}>
-                    <div>
-                      <strong>Titulo:</strong>
-                      {detailedLoans.book.title}
-                    </div>
-                    <div>
-                      <strong>Author:</strong>
-                      {detailedLoans.book.author}
-                    </div>
-                    <div>
-                      <strong>Gender:</strong>
-                      {detailedLoans.book.genre}
-                    </div>
-                    <div>
-                      <strong>Status:</strong>
-                      Devolução em x dias
-                    </div>
-                  </div>
-                </div>
-              </>
-            );
-          })}
+                </>
+              );
+            })}
         </div>
       ) : (
         ""
